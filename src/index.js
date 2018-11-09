@@ -15,7 +15,6 @@ import fs from 'fs'
 // 加载资源
 const iconSources = (() => {
   const bufIcons = {
-    bg: fs.readFileSync(__dirname + '/img/bg.jpg'),
     blockEnd: fs.readFileSync(__dirname + '/img/back.png'),
     blockFront: fs.readFileSync(__dirname + '/img/front.png'),
     bomb: fs.readFileSync(__dirname + '/img/bomb.png'),
@@ -116,7 +115,7 @@ class Panel {
     this.isFirstClick = true
     this.updateSize()
     this.blocks = this.initBlocks(this.rows, this.cols)
-    this.reDraw()
+    this.drawBlacks()
   }
 
   createCanvas() {
@@ -168,6 +167,8 @@ class Panel {
   }
 
   drawBlacks() {
+    let { width, height } = this.canvas
+    this.context.clearRect(0, 0, +width, +height)
     this.blocks.forEach(block => {
       block.draw({
         context: this.context,
@@ -175,12 +176,6 @@ class Panel {
         space: this.blockSpace
       })
     })
-  }
-
-  reDraw() {
-    let { width, height } = this.canvas
-    this.context.clearRect(0, 0, +width, +height)
-    this.drawBlacks()
   }
 
   getCurBlock(event) {
@@ -208,7 +203,7 @@ class Panel {
       this.isFirstClick = false
     }
     curBlock.isOpened = true
-    this.reDraw()
+    this.drawBlacks()
     if (!curBlock.num) {
       this.openZeroBlocks(curBlock)
     } else if (curBlock.num === 9) {
@@ -225,7 +220,7 @@ class Panel {
     let curBlock = this.getCurBlock(event)
     if (!curBlock || curBlock.isOpened) return
     curBlock.isFlag = !curBlock.isFlag
-    this.reDraw()
+    this.drawBlacks()
   }
 
   updateMineMap(block) {
@@ -314,7 +309,7 @@ class Panel {
       }
     }
     checkedBlocks.forEach(_ => _.isOpened = true)
-    this.reDraw()
+    this.drawBlacks()
   }
 
   checkDone() {
