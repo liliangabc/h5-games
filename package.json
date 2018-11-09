@@ -1,0 +1,13 @@
+{
+  "name": "es6-demos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "parcel index.html",
+    "build": "parcel build index.html --no-source-maps"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
