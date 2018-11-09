@@ -266,6 +266,20 @@ class Panel {
     return arr.filter(_ => _)
   }
 
+  getTRBLBlocks(i) {
+    let t = this.blocks[i - this.cols]
+    let r = this.blocks[i + 1]
+    let b = this.blocks[i + this.cols]
+    let l = this.blocks[i - 1]
+    let arr = [t, r, b, l]
+    if (i % this.cols === 0) {
+      arr = [t, r, b]
+    } else if ((i + 1) % this.cols === 0) {
+      arr = [t, b, l]
+    }
+    return arr.filter(_ => _)
+  }
+
   updateBlocksNum() {
     for (let i = 0, len = this.blocks.length; i < len; i++) {
       let block = this.blocks[i]
@@ -291,7 +305,7 @@ class Panel {
       let b = noCheckBlocks.pop()
       if (checkedBlocks.indexOf(b) === -1) checkedBlocks.push(b)
       let index = this.blocks.indexOf(b)
-      let roundBlocks = this.getRoundBlocks(index)
+      let roundBlocks = this.getTRBLBlocks(index)
       for (let i = 0, len = roundBlocks.length; i < len; i++) {
         let _ = roundBlocks[i]
         if (!_.num && !_.isFlag && checkedBlocks.indexOf(_) === -1) {
