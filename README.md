@@ -11,6 +11,6 @@ $ npm i parcel -g
 # serve with hot reload at localhost:1234
 $ npm run dev
 
-# build for production and launch server
+# build for production
 $ npm run build
 ```
