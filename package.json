@@ -7,7 +7,7 @@
     "dev": "parcel index.html --open",
     "build": "parcel build index.html --no-source-maps"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["canvas", "javascript", "js", "H5"],
+  "author": "liliang",
   "license": "ISC"
 }
