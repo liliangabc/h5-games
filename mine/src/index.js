@@ -1,8 +1,12 @@
+/**
+ * 扫雷游戏
+ * author: liliang
+ */
+
 import fs from 'fs'
 
-// 加载样式表
 !function() {
-  let styleStr = fs.readFileSync(__dirname + '/css/style.css', 'utf8')
+  let styleStr = fs.readFileSync(__dirname + '/assets/css/style.css', 'utf8')
   const styleEl = document.getElementById('gameStylesheet')
   if (styleEl) return
   const newStyleEl = document.createElement('style')
@@ -12,26 +16,44 @@ import fs from 'fs'
   document.head.appendChild(newStyleEl)
 }()
 
-// 加载资源
-const iconSources = (() => {
+const source = { icons: {}, isIconsLoaded: false }
+
+source.base64Strs = (() => {
   const bufIcons = {
-    blockEnd: fs.readFileSync(__dirname + '/img/back.png'),
-    blockFront: fs.readFileSync(__dirname + '/img/front.png'),
-    bomb: fs.readFileSync(__dirname + '/img/bomb.png'),
-    bombActive: fs.readFileSync(__dirname + '/img/bomb-color.png'),
-    flag: fs.readFileSync(__dirname + '/img/flag.png'),
-    flagActive: fs.readFileSync(__dirname + '/img/flag-color.png')
-  }
-  const rtnIcons = {}
+    blockEnd: fs.readFileSync(__dirname + '/assets/img/back.png'),
+    blockFront: fs.readFileSync(__dirname + '/assets/img/front.png'),
+    bomb: fs.readFileSync(__dirname + '/assets/img/bomb.png'),
+    bombActive: fs.readFileSync(__dirname + '/assets/img/bomb-color.png'),
+    flag: fs.readFileSync(__dirname + '/assets/img/flag.png'),
+    flagActive: fs.readFileSync(__dirname + '/assets/img/flag-color.png')
+  }, rtnObj = {}
   Object.keys(bufIcons).forEach(_ => 
-    rtnIcons[_] = `data:image/png;base64,${bufIcons[_].toString('base64')}`
+    rtnObj[_] = `data:image/png;base64,${bufIcons[_].toString('base64')}`
   )
-  return rtnIcons
+  return rtnObj
 })()
 
-let gameIcons = {}
+source.loadSingleIcon = function (key) {
+  return new Promise(resolve => {
+    const image = new Image()
+    image.onload = () => {
+      image.onload = null
+      resolve({ [key]: image })
+    }
+    image.src = this.base64Strs[key]
+  })
+}
 
-// 方块类
+source.loadIcons = function () {
+  if (this.isIconsLoaded) return Promise.resolve()
+  return Promise.all(Object.keys(this.base64Strs).map(_ => 
+    this.loadSingleIcon(_)
+  )).then(values => {
+    this.isIconsLoaded = true
+    values.forEach(item => this.icons = { ...this.icons, ...item })
+  })
+}
+
 class Block {
   constructor({ row, col, num = 0 }) {
     this.row = row
@@ -77,86 +99,43 @@ class Block {
   }
 
   draw({ context, size, space = 6 }) {
+    let params = { context, size, space }
+    let { blockEnd, bomb, blockFront, flagActive } = source.icons
     if (this.isOpened) {
-      this.drawBG({ context, size, space, icon: gameIcons.blockEnd })
-      if (!this.num) return
-      if (this.num === 9) {
-        this.drawIcon({ context, size, space, icon: gameIcons.bomb })
-      } else {
-        this.drawText({ context, size, space })
+      this.drawBG({ ...params, icon: blockEnd })
+      if (this.num > 0 && this.num < 9) {
+        this.drawText(params)
+      } else if (this.num === 9) {
+        this.drawIcon({ ...params, icon: bomb })
       }
     } else {
-      this.drawBG({ context, size, space, icon: gameIcons.blockFront })
+      this.drawBG({ ...params, icon: blockFront })
       if (this.isFlag) {
-        this.drawIcon({ context, size, space, icon: gameIcons.flagActive })
+        this.drawIcon({ ...params, icon: flagActive })
       }
     }
   }
 }
 
-// 面板类
-class Panel {
-  constructor({ rows, cols, mineCount, blockSpace = 6 }) {
-    this.rows = rows
-    this.cols = cols
-    this.mineCount = mineCount
-    this.blockSpace = blockSpace
-    this.blockSize = null
-    this.pixRatio = 1
-    const { canvas, context } = this.createCanvas()
-    this.canvas = canvas
-    this.context = context
-    this.initLayout()
-    this.addListener()
-  }
-
-  initLayout() {
-    this.isEnd = false
-    this.isFirstClick = true
-    this.updateSize()
-    this.blocks = this.initBlocks(this.rows, this.cols)
-    this.drawBlacks()
-  }
-
+const utils = {
   createCanvas() {
     const wrapper = document.createElement('div')
     const canvas = document.createElement('canvas')
     wrapper.className = 'game-wrapper'
     canvas.className = 'game-ui'
-    const context = canvas.getContext('2d')
     wrapper.appendChild(canvas)
     document.body.appendChild(wrapper)
-    return { canvas, context }
-  }
+    return canvas
+  },
 
-  getPixRatio() {
-    var backingStore = this.context.backingStorePixelRatio ||
-      this.context.webkitBackingStorePixelRatio ||
-      this.context.mozBackingStorePixelRatio || 1
+  getPixRatio(context) {
+    var backingStore = context.backingStorePixelRatio ||
+      context.webkitBackingStorePixelRatio ||
+      context.mozBackingStorePixelRatio || 1
     return (window.devicePixelRatio || 1) / backingStore
-  }
+  },
 
-  updateSize() {
-    let pixRatio = this.getPixRatio()
-    let width = this.canvas.offsetWidth
-    let canvasHeight, canvasWidth = pixRatio * width
-    this.blockSize = (canvasWidth - this.blockSpace) / this.cols
-    let maxHeight = pixRatio * (window.innerHeight - 100)
-    if (this.rows) {
-      if (this.rows * this.blockSize > maxHeight) {
-        this.rows = Math.floor(maxHeight / this.blockSize)
-      }
-      canvasHeight = this.rows * this.blockSize + this.blockSpace
-    } else {
-      this.rows = this.cols
-      canvasHeight = canvasWidth
-    }
-    this.pixRatio = pixRatio
-    this.canvas.width = canvasWidth
-    this.canvas.height = canvasHeight
-  }
-
-  initBlocks(rows, cols) {
+  genBlocks(rows, cols) {
     const blocks = []
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -165,8 +144,50 @@ class Panel {
     }
     return blocks
   }
+}
 
-  drawBlacks() {
+class Game {
+  constructor({ rows, cols, mineCount, blockSpace }) {
+    this.canvas = utils.createCanvas()
+    this.context = this.canvas.getContext('2d')
+    this.pixRatio = utils.getPixRatio(this.context)
+    this.initUI({ rows, cols, mineCount, blockSpace })
+    this.addListener()
+  }
+
+  initUI({ rows, cols, mineCount, blockSpace = 6 }) {
+    this.rows = rows
+    this.cols = cols
+    this.mineCount = mineCount
+    this.blockSpace = blockSpace
+    this.blockSize = 0
+    this.isEnd = false
+    this.isFirstClick = true
+    this.updateSize()
+    this.blocks = utils.genBlocks(this.rows, this.cols)
+    this.drawBlocks()
+  }
+
+  updateSize() {
+    let width = this.canvas.offsetWidth
+    let canvasHeight, canvasWidth = this.pixRatio * width
+    let blockSize = (canvasWidth - this.blockSpace) / this.cols
+    let maxHeight = this.pixRatio * (window.innerHeight - 100)
+    if (this.rows) {
+      if (this.rows * blockSize > maxHeight) {
+        this.rows = Math.floor(maxHeight / blockSize)
+      }
+      canvasHeight = this.rows * blockSize + this.blockSpace
+    } else {
+      this.rows = this.cols
+      canvasHeight = canvasWidth
+    }
+    this.blockSize = blockSize
+    this.canvas.width = canvasWidth
+    this.canvas.height = canvasHeight
+  }
+
+  drawBlocks() {
     let { width, height } = this.canvas
     this.context.clearRect(0, 0, +width, +height)
     this.blocks.forEach(block => {
@@ -203,7 +224,7 @@ class Panel {
       this.isFirstClick = false
     }
     curBlock.isOpened = true
-    this.drawBlacks()
+    this.drawBlocks()
     if (!curBlock.num) {
       this.openZeroBlocks(curBlock)
     } else if (curBlock.num === 9) {
@@ -220,7 +241,7 @@ class Panel {
     let curBlock = this.getCurBlock(event)
     if (!curBlock || curBlock.isOpened) return
     curBlock.isFlag = !curBlock.isFlag
-    this.drawBlacks()
+    this.drawBlocks()
   }
 
   updateMineMap(block) {
@@ -309,7 +330,7 @@ class Panel {
       }
     }
     checkedBlocks.forEach(_ => _.isOpened = true)
-    this.drawBlacks()
+    this.drawBlocks()
   }
 
   checkDone() {
@@ -321,31 +342,6 @@ class Panel {
   }
 }
 
-// 游戏类
-class Game {
-  loadIcons(icons) {
-    if (this.isIconsLoaded) return Promise.resolve()
-    const loadImage = key => {
-      return new Promise(resolve => {
-        const image = new Image()
-        image.onload = () => {
-          image.onload = null
-          resolve({ [key]: image })
-        }
-        image.src = icons[key]
-      })
-    }
-    return Promise.all(Object.keys(icons).map(_ => loadImage(_))).then(values => {
-      this.isIconsLoaded = true
-      values.forEach(item => gameIcons = { ...gameIcons, ...item })
-    })
-  }
-  
-  start() {
-    this.loadIcons(iconSources).then(() => {
-      const panel = new Panel({ cols: 9, mineCount: 10 })
-    })
-  }
-}
-
-new Game().start()
+source.loadIcons().then(() => {
+  new Game({ cols: 9, mineCount: 10 })
+})
