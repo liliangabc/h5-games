@@ -2172,7 +2172,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 !function () {
-  var styleStr = "* {\r\n  padding: 0;\r\n  margin: 0;\r\n  box-sizing: border-box;\r\n}\r\n\r\nbody {\r\n  background-color: #fbe9e7;\r\n}\r\n\r\n.game-wrapper {\r\n  width: 100%;\r\n  max-width: 480px;\r\n  margin: auto;\r\n  padding: 6px;\r\n}\r\n\r\n.game-wrapper canvas.game-ui {\r\n  display: block;\r\n  width: 100%;\r\n  background-color: #aaa;\r\n  border-radius: 4px;\r\n  cursor: pointer;\r\n  -webkit-tap-highlight-color: transparent;\r\n}";
+  var styleStr = "* {\r\n  padding: 0;\r\n  margin: 0;\r\n  box-sizing: border-box;\r\n}\r\n\r\nbody {\r\n  background-color: #fbe9e7;\r\n}\r\n\r\n.game-wrapper {\r\n  width: 100%;\r\n  max-width: 480px;\r\n  margin: auto;\r\n  padding: 0 6px 6px;\r\n}\r\n\r\n.game-wrapper canvas.game-ui {\r\n  display: block;\r\n  width: 100%;\r\n  cursor: pointer;\r\n  -webkit-tap-highlight-color: transparent;\r\n}\r\n\r\n.game-wrapper .game-dashboard {\r\n  height: 100px;\r\n  padding: 8px 0;\r\n}\r\n\r\n.game-wrapper .game-dashboard .innerbox {\r\n  height: 100%;\r\n  padding: 12px;\r\n  font-size: 13px;\r\n  color: #607d8b;\r\n  display: flex;\r\n  align-items: center;\r\n}\r\n\r\n.game-wrapper canvas.game-ui,\r\n.game-wrapper .game-dashboard .innerbox {\r\n  border-radius: 4px;\r\n  background-color: #cfd8dc;\r\n}";
   var styleEl = document.getElementById('gameStylesheet');
   if (styleEl) return;
   var newStyleEl = document.createElement('style');
@@ -2185,15 +2185,16 @@ var source = {
   icons: {},
   isIconsLoaded: false
 };
+source.templates = {
+  dashboard: "<div class=\"game-dashboard\">\r\n  <div class=\"innerbox\">\r\n    <p><b>\u8FD9\u91CC\u662F\u4EEA\u8868\u76D8\uFF1B</b>\u7528\u6765\u5C55\u793A\u6E38\u620F\u72B6\u6001 (\u5982\uFF1A\u5DF2\u6807\u8BB0\u65B9\u5757\u8BA1\u6570\uFF0C\u5DF2\u70B9\u5F00\u65B9\u5757\u8BA1\u6570\uFF0C\u96F7\u7684\u6570\u91CF)\u4EE5\u53CA\u63D0\u4F9B\u4E00\u4E2A\u6309\u94AE\u5BF9\u6E38\u620F\u8FDB\u884C\u914D\u7F6E</p>\r\n  </div>\r\n</div>"
+};
 
 source.base64Strs = function () {
   var bufIcons = {
     blockEnd: Buffer("iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN0QAADdEBwivf4wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGrSURBVFiF7ZlPTsJAFId/700TrYUWXZhSVAw7PQSykMAVPAtrD+ApuIJEF8oBXLo0Ev/EmMifItRIOs+FyILEuGhCx6RfMvsv75vZvCERAQDU6k1fa30KoMpEZRAIq0QgWqQHoMvMrauL8xcAIBFBrd5siNbt4aA/Go8G4UcURSuVm7Nu23be23QLm1seMZ9cXZx36Oi44YvWtw/3d0/RdDJJQ2wZe8NxdvcrJWI+VHv7lbNh/y0Y9t8GaYv9MJt9zpRlWWvrdoUBVMPhIExbapm5U9VionI0ndykLbRMNJ1ETHRgYf5QDIU4bYO/sADA4AmaL5glToolMFdQkCVOjvGCWeKkGC+YJU5KNsGkGC+YJU6K8YJZ4qQYL5glTorxgv8isQDmTZGIAEAsrePehpOz38dhKlvV33ByeVvruMcAdbf9opu20DLfTtRlpVSrGJQ81ys4IgITjusVnGJQ8pRSLRIRHB03GqJ1+/npcfT68hy+j8fRqu8kESGXz9vbfuAGpR2PmE+uLzudxfKyVm/6cRyfQqTKSpWBFX9DAKLjuAeirlJq8Q3xBZXrMZo1QiYvAAAAAElFTkSuQmCC", "base64"),
     blockFront: Buffer("iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAN0QAADdEBwivf4wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHBSURBVFiF7Zk/ThtREId/894j+5fdRXaAiMJNFCkcwiEIYjgCZ3Hts3AE/kkB+QApXURpXERJHFuyF6/XJtoZKiynSLWS/SLtd4JP32iaGRIRAMDR6dm+1roDoMnMDQCE9SJKqT6AblEU7Ye7658AQCKCj5/OW0R0+Wbv9WS3XksD38+J1usnIshmM28wHEU/fv2OReTi/vbqhj6ctPaVUr3Dd2+/R9thtlarf5A+ToPe128HzHxotFKd3XptEgZ+xsybdgMAhIGf7dVrk8Fw1DEAmjtJnBZFsWmvv9hJ4nQwHDUNizRc1/liS70XXNfJWeS9gQixZfWWiJARALaN9wUBYADAtvGuYgB7CwJVwfJUBctSFSzL/yFYjbgEVcGyVAXLQbYX1JYX1JYLkrZ8STQsX5KloK0FAcsLAlXB8lQFy2IAiMWCYoS5r82W9+dpkW/aZpWtV44nzH0DoOv6wfE8n1kluO0HEYDPhpRqh1Hcy6bpdJHnVpyAHc8LwiiOiahNIoKj07OWCF+m4/Fkmo7TxXy+kZqO63phlERRksRE6uLh7vqGVt8QzNwB0FSKGsCaz/wQYZY+gK5SavmGeAaV/fpQD4SQKgAAAABJRU5ErkJggg==", "base64"),
     bomb: Buffer("iVBORw0KGgoAAAANSUhEUgAAABUAAAAeCAYAAADD0FVVAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFhgAABYYBG6Yz4AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGUSURBVEiJrZW7SgNREIa/PYhBsQmCiIWFRWzFWFqI4CvoEyio2AqWFla+QN7Axjew8NKK9oqmsjIGjBESjeS3yByve8lu9octlvnnY3Z2zpxAEhk1CuwCp8D5z4DLCFwHHoDtUIaktM+BpHdJTUlTYZ60wD1JHfW0FuVLAyxKahvwOM6bpqcbQBd4AjZjnSkqrVqVq0neIGGkalYdwATwDjwDI8ACcBuWNJTwyR/A5I/3YYPXiBnHqEAB2AfGI+JFYMd8/xXSk7L1z//pKL2Zr5w0UoeS6gmwv6pbXih0S71TkkVNy/8FnZZUywj0qhnnC3opqTsgtGscHLAIzABBzGj1o8A4ix5aHBDoVfTQZQav0isAlh1QygnoVXJEnYrsKjigkTO04YDrnKHXDjgBOjkBO8CJAy6Al5ygL8CFA+6BI6A9ILBtnHt/TIf1fV1kVdU4v7bUvNKvPa+65Yfu0zlJd5JafcJa5p9TzJJGUkFSRdKjets9TG8Wr5i/79t0FlgCVoAyMAa8Alf0xvAMuAlL/AQOkeuIsYF05QAAAABJRU5ErkJggg==", "base64"),
-    bombActive: Buffer("iVBORw0KGgoAAAANSUhEUgAAABUAAAAeCAYAAADD0FVVAAAACXBIWXMAAAWGAAAFhgEbpjPgAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAKlJREFUSInVluEKwzAIhM/Q91775NcfW2FNNWqSDXJQCFG/qgkSkET3t4PafkG3hLaFps0SgeOzfMlE6DvWcsiWH8qgt6dmllmoW/alrZmOqCdMACA5rachmVAjy5BdhXpAz+92T6MwTd89/m1PR7Ks48sMYA3+75UakSA4JDJap/yFoK0R1iOSslD5QHuKZ3RxSr0xCrxBR8B13KOnWbDm775QtLHo/fgEZl+EaKcSRMgAAAAASUVORK5CYII=", "base64"),
-    flag: Buffer("iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAi0lEQVRIie3WwQqAMAgG4Ize/5XttEGm8tvUQ8zTiI0vZROJmY9AyM2EHrwWEPnNRc8AhPyIWZ5IRhFwxMwyMyML5Q5ogl1QW0ZtEFXcugcwFlXQ6/FWlE7tEJkZuS0oA4Ia62rp4O79u3e0oQ1tKCGQXudNmPBcZ0Gh8RVBJfQF8FB1rstCNLDvMtyI9hRHUJ9lNAAAAABJRU5ErkJggg==", "base64"),
-    flagActive: Buffer("iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAoklEQVRIie3WwQ2AIAwFUGpczMmMkzna9wIKpECR2oOhJwPKowgNBMBJg4iSlwGQ9Nv1LeIbn7YGukghwUzguMn4EGfUBYaIstTLqIR6+FsoAm0gZ5WRGQSQ/q7LgPD4DcQcXv2lK1QIvYwaJWgcEhbWsaXrqN4/O0cTmtCEVKJZ646tfIWK+/azXo6Iu6nWBpcEhybQKFAD73+kjeRjmm2GCx6wOIUIqsGWAAAAAElFTkSuQmCC", "base64")
+    flag: Buffer("iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAYAAAAy2w7YAAAAoklEQVRIie3WwQ2AIAwFUGpczMmMkzna9wIKpECR2oOhJwPKowgNBMBJg4iSlwGQ9Nv1LeIbn7YGukghwUzguMn4EGfUBYaIstTLqIR6+FsoAm0gZ5WRGQSQ/q7LgPD4DcQcXv2lK1QIvYwaJWgcEhbWsaXrqN4/O0cTmtCEVKJZ646tfIWK+/azXo6Iu6nWBpcEhybQKFAD73+kjeRjmm2GCx6wOIUIqsGWAAAAAElFTkSuQmCC", "base64")
   },
       rtnObj = {};
   Object.keys(bufIcons).forEach(function (_) {
@@ -2316,7 +2317,7 @@ function () {
           blockEnd = _source$icons.blockEnd,
           bomb = _source$icons.bomb,
           blockFront = _source$icons.blockFront,
-          flagActive = _source$icons.flagActive;
+          flag = _source$icons.flag;
 
       if (this.isOpened) {
         this.drawBG(_objectSpread({}, params, {
@@ -2337,7 +2338,7 @@ function () {
 
         if (this.isFlag) {
           this.drawIcon(_objectSpread({}, params, {
-            icon: flagActive
+            icon: flag
           }));
         }
       }
@@ -2348,13 +2349,17 @@ function () {
 }();
 
 var utils = {
-  createCanvas: function createCanvas() {
+  createWrapper: function createWrapper(mountEl) {
+    mountEl = mountEl || document.body;
     var wrapper = document.createElement('div');
-    var canvas = document.createElement('canvas');
     wrapper.className = 'game-wrapper';
+    mountEl.appendChild(wrapper);
+    return wrapper;
+  },
+  createCanvas: function createCanvas(wrapper) {
+    var canvas = document.createElement('canvas');
     canvas.className = 'game-ui';
     wrapper.appendChild(canvas);
-    document.body.appendChild(wrapper);
     return canvas;
   },
   getPixRatio: function getPixRatio(context) {
@@ -2374,40 +2379,35 @@ var utils = {
     }
 
     return blocks;
+  },
+  isFunc: function isFunc(func) {
+    return typeof func === 'function';
   }
 };
 
 var Game =
 /*#__PURE__*/
 function () {
-  function Game(_ref6) {
-    var rows = _ref6.rows,
-        cols = _ref6.cols,
-        mineCount = _ref6.mineCount,
-        blockSpace = _ref6.blockSpace;
+  function Game(wrapper) {
+    var callbacks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, Game);
 
-    this.canvas = utils.createCanvas();
+    this.callbacks = callbacks;
+    this.canvas = utils.createCanvas(wrapper);
     this.context = this.canvas.getContext('2d');
     this.pixRatio = utils.getPixRatio(this.context);
-    this.initUI({
-      rows: rows,
-      cols: cols,
-      mineCount: mineCount,
-      blockSpace: blockSpace
-    });
     this.addListener();
   }
 
   _createClass(Game, [{
     key: "initUI",
-    value: function initUI(_ref7) {
-      var rows = _ref7.rows,
-          cols = _ref7.cols,
-          mineCount = _ref7.mineCount,
-          _ref7$blockSpace = _ref7.blockSpace,
-          blockSpace = _ref7$blockSpace === void 0 ? 6 : _ref7$blockSpace;
+    value: function initUI(_ref6) {
+      var rows = _ref6.rows,
+          cols = _ref6.cols,
+          mineCount = _ref6.mineCount,
+          _ref6$blockSpace = _ref6.blockSpace,
+          blockSpace = _ref6$blockSpace === void 0 ? 6 : _ref6$blockSpace;
       this.rows = rows;
       this.cols = cols;
       this.mineCount = mineCount;
@@ -2485,24 +2485,27 @@ function () {
       if (this.isEnd) return;
       var curBlock = this.getCurBlock(event);
       if (!curBlock || curBlock.isOpened || curBlock.isFlag) return;
+      var _this$callbacks = this.callbacks,
+          onWinning = _this$callbacks.onWinning,
+          onOver = _this$callbacks.onOver,
+          onUpdate = _this$callbacks.onUpdate;
 
       if (this.isFirstClick) {
-        this.updateMineMap(curBlock);
         this.isFirstClick = false;
+        this.updateMineMap(curBlock);
       }
 
       curBlock.isOpened = true;
-      this.drawBlocks();
 
-      if (!curBlock.num) {
-        this.openZeroBlocks(curBlock);
-      } else if (curBlock.num === 9) {
+      if (curBlock.num === 9) {
         this.bombAndOver();
+        return utils.isFunc(onOver) && onOver();
       }
 
-      if (this.checkDone()) {
-        alert('恭喜！你完成了！');
-      }
+      if (!curBlock.num) this.openZeroBlocks(curBlock);
+      this.drawBlocks();
+      utils.isFunc(onUpdate) && onUpdate();
+      if (this.checkDone()) utils.isFunc(onWinning) && onWinning();
     }
   }, {
     key: "onContextmenu",
@@ -2513,6 +2516,7 @@ function () {
       if (!curBlock || curBlock.isOpened) return;
       curBlock.isFlag = !curBlock.isFlag;
       this.drawBlocks();
+      utils.isFunc(this.callbacks.onUpdate) && this.callbacks.onUpdate();
     }
   }, {
     key: "updateMineMap",
@@ -2637,7 +2641,6 @@ function () {
       checkedBlocks.forEach(function (_) {
         return _.isOpened = true;
       });
-      this.drawBlocks();
     }
   }, {
     key: "checkDone",
@@ -2649,18 +2652,114 @@ function () {
 
       return true;
     }
+  }, {
+    key: "getState",
+    value: function getState() {
+      var flags = 0,
+          opens = 0;
+
+      for (var i = 0, len = this.blocks.length; i < len; i++) {
+        var _this$blocks$i = this.blocks[i],
+            isFlag = _this$blocks$i.isFlag,
+            isOpened = _this$blocks$i.isOpened;
+        if (isFlag) flags += 1;else if (isOpened) opens += 1;
+      }
+
+      return {
+        flags: flags,
+        opens: opens
+      };
+    }
   }]);
 
   return Game;
 }();
 
-source.loadIcons().then(function () {
-  new Game({
-    cols: 9,
-    mineCount: 10
-  });
+var GameController =
+/*#__PURE__*/
+function () {
+  function GameController(mountEl) {
+    var callbacks = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, GameController);
+
+    this.callbacks = callbacks;
+    this.container = utils.createWrapper(mountEl);
+    this.container.innerHTML = source.templates.dashboard;
+    this.game = new Game(this.container, {
+      onWinning: this.onWinning.bind(this),
+      onOver: this.onOver.bind(this),
+      onUpdate: this.onUpdate.bind(this)
+    });
+  }
+
+  _createClass(GameController, [{
+    key: "start",
+    value: function start(_ref7) {
+      var _this5 = this;
+
+      var rows = _ref7.rows,
+          cols = _ref7.cols,
+          mineCount = _ref7.mineCount,
+          blockSpace = _ref7.blockSpace;
+      this.state = {
+        flags: 0,
+        opens: 0
+      };
+      source.loadIcons().then(function () {
+        _this5.game.initUI({
+          rows: rows,
+          cols: cols,
+          mineCount: mineCount,
+          blockSpace: blockSpace
+        });
+      });
+    }
+  }, {
+    key: "onWinning",
+    value: function onWinning() {
+      utils.isFunc(this.callbacks.onWinning) && this.callbacks.onWinning();
+    }
+  }, {
+    key: "onOver",
+    value: function onOver() {
+      utils.isFunc(this.callbacks.onOver) && this.callbacks.onOver();
+    }
+  }, {
+    key: "onUpdate",
+    value: function onUpdate() {
+      this.state = this.game.getState();
+      utils.isFunc(this.callbacks.onUpdate) && this.callbacks.onUpdate(this.state);
+    }
+  }]);
+
+  return GameController;
+}();
+
+module.exports = GameController;
+},{"fs":"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/_empty.js","buffer":"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"src/demo.js":[function(require,module,exports) {
+"use strict";
+
+var _index = _interopRequireDefault(require("./index"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var controller = new _index.default(null, {
+  onWinning: function onWinning() {
+    console.log('恭喜你！你胜利了！');
+  },
+  onOver: function onOver() {
+    console.log('不好意思，你挂了！');
+  },
+  onUpdate: function onUpdate(state) {
+    console.log(state);
+  }
 });
-},{"fs":"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/_empty.js","buffer":"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/node_modules/buffer/index.js"}],"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+controller.start({
+  cols: 9,
+  mineCount: 10
+});
+},{"./index":"src/index.js"}],"C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -2687,7 +2786,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65339" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53277" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
@@ -2829,5 +2928,4 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},["C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/index.js"], null)
-//# sourceMappingURL=/src.a2b27638.map
+},{}]},{},["C:/Users/liliang/AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/demo.js"], null)

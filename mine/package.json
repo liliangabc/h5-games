@@ -4,8 +4,9 @@
   "description": "h5-games project",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.html",
-    "build": "parcel build /index.html --no-source-maps"
+    "dev": "parcel index.html --no-source-maps --open",
+    "build": "parcel build index.html --no-source-maps",
+    "build_umd": "parcel build ./src/index.js --out-file mine.umd.js --global MineController --no-source-maps"
   },
   "keywords": ["canvas", "javascript", "js", "H5"],
   "author": "liliang",

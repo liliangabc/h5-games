@@ -18,14 +18,16 @@ import fs from 'fs'
 
 const source = { icons: {}, isIconsLoaded: false }
 
+source.templates = {
+  dashboard: fs.readFileSync(__dirname + '/assets/html/dashboard.html', 'utf8')
+}
+
 source.base64Strs = (() => {
   const bufIcons = {
     blockEnd: fs.readFileSync(__dirname + '/assets/img/back.png'),
     blockFront: fs.readFileSync(__dirname + '/assets/img/front.png'),
     bomb: fs.readFileSync(__dirname + '/assets/img/bomb.png'),
-    bombActive: fs.readFileSync(__dirname + '/assets/img/bomb-color.png'),
-    flag: fs.readFileSync(__dirname + '/assets/img/flag.png'),
-    flagActive: fs.readFileSync(__dirname + '/assets/img/flag-color.png')
+    flag: fs.readFileSync(__dirname + '/assets/img/flag-color.png')
   }, rtnObj = {}
   Object.keys(bufIcons).forEach(_ => 
     rtnObj[_] = `data:image/png;base64,${bufIcons[_].toString('base64')}`
@@ -100,7 +102,7 @@ class Block {
 
   draw({ context, size, space = 6 }) {
     let params = { context, size, space }
-    let { blockEnd, bomb, blockFront, flagActive } = source.icons
+    let { blockEnd, bomb, blockFront, flag } = source.icons
     if (this.isOpened) {
       this.drawBG({ ...params, icon: blockEnd })
       if (this.num > 0 && this.num < 9) {
@@ -111,20 +113,25 @@ class Block {
     } else {
       this.drawBG({ ...params, icon: blockFront })
       if (this.isFlag) {
-        this.drawIcon({ ...params, icon: flagActive })
+        this.drawIcon({ ...params, icon: flag })
       }
     }
   }
 }
 
 const utils = {
-  createCanvas() {
+  createWrapper(mountEl) {
+    mountEl = mountEl || document.body
     const wrapper = document.createElement('div')
-    const canvas = document.createElement('canvas')
     wrapper.className = 'game-wrapper'
+    mountEl.appendChild(wrapper)
+    return wrapper
+  },
+
+  createCanvas(wrapper) {
+    const canvas = document.createElement('canvas')
     canvas.className = 'game-ui'
     wrapper.appendChild(canvas)
-    document.body.appendChild(wrapper)
     return canvas
   },
 
@@ -143,15 +150,19 @@ const utils = {
       }
     }
     return blocks
+  },
+
+  isFunc(func) {
+    return typeof func === 'function'
   }
 }
 
 class Game {
-  constructor({ rows, cols, mineCount, blockSpace }) {
-    this.canvas = utils.createCanvas()
+  constructor(wrapper, callbacks = {}) {
+    this.callbacks = callbacks
+    this.canvas = utils.createCanvas(wrapper)
     this.context = this.canvas.getContext('2d')
     this.pixRatio = utils.getPixRatio(this.context)
-    this.initUI({ rows, cols, mineCount, blockSpace })
     this.addListener()
   }
 
@@ -219,20 +230,20 @@ class Game {
     if (this.isEnd) return
     let curBlock = this.getCurBlock(event)
     if (!curBlock || curBlock.isOpened || curBlock.isFlag) return
+    let { onWinning, onOver, onUpdate } = this.callbacks
     if (this.isFirstClick) {
-      this.updateMineMap(curBlock)
       this.isFirstClick = false
+      this.updateMineMap(curBlock)
     }
     curBlock.isOpened = true
-    this.drawBlocks()
-    if (!curBlock.num) {
-      this.openZeroBlocks(curBlock)
-    } else if (curBlock.num === 9) {
+    if (curBlock.num === 9) {
       this.bombAndOver()
+      return utils.isFunc(onOver) && onOver()
     }
-    if (this.checkDone()) {
-      alert('恭喜！你完成了！')
-    }
+    if (!curBlock.num) this.openZeroBlocks(curBlock)
+    this.drawBlocks()
+    utils.isFunc(onUpdate) && onUpdate()
+    if (this.checkDone()) utils.isFunc(onWinning) && onWinning()
   }
 
   onContextmenu(event) {
@@ -242,6 +253,7 @@ class Game {
     if (!curBlock || curBlock.isOpened) return
     curBlock.isFlag = !curBlock.isFlag
     this.drawBlocks()
+    utils.isFunc(this.callbacks.onUpdate) && this.callbacks.onUpdate()
   }
 
   updateMineMap(block) {
@@ -330,7 +342,6 @@ class Game {
       }
     }
     checkedBlocks.forEach(_ => _.isOpened = true)
-    this.drawBlocks()
   }
 
   checkDone() {
@@ -340,8 +351,49 @@ class Game {
     }
     return true
   }
+  
+  getState() {
+    let flags = 0, opens = 0
+    for (let i = 0, len = this.blocks.length; i < len; i++) {
+      let { isFlag, isOpened } = this.blocks[i]
+      if (isFlag) flags += 1
+      else if (isOpened) opens += 1
+    }
+    return { flags, opens }
+  }
 }
 
-source.loadIcons().then(() => {
-  new Game({ cols: 9, mineCount: 10 })
-})
+class GameController {
+  constructor(mountEl, callbacks = {}) {
+    this.callbacks = callbacks
+    this.container = utils.createWrapper(mountEl)
+    this.container.innerHTML = source.templates.dashboard
+    this.game = new Game(this.container, {
+      onWinning: this.onWinning.bind(this),
+      onOver: this.onOver.bind(this),
+      onUpdate: this.onUpdate.bind(this)
+    })
+  }
+
+  start({ rows, cols, mineCount, blockSpace }) {
+    this.state = { flags: 0, opens: 0 }
+    source.loadIcons().then(() => {
+      this.game.initUI({ rows, cols, mineCount, blockSpace })
+    })
+  }
+
+  onWinning() {
+    utils.isFunc(this.callbacks.onWinning) && this.callbacks.onWinning()
+  }
+
+  onOver() {
+    utils.isFunc(this.callbacks.onOver) && this.callbacks.onOver()
+  }
+
+  onUpdate() {
+    this.state = this.game.getState()
+    utils.isFunc(this.callbacks.onUpdate) && this.callbacks.onUpdate(this.state)
+  }
+}
+
+module.exports = GameController
